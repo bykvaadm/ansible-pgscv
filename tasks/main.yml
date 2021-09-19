@@ -19,7 +19,7 @@
         --stop-timeout=30 \
         --env=PGSCV_LISTEN_ADDRESS=0.0.0.0:9890 \
       {% if pgscv_exporter_disable_collectors is defined %}
-        --env=PGSCV_DISABLE_COLLECTORS="{{ pgscv_exporter_disable_collectors }}"
+        --env=PGSCV_DISABLE_COLLECTORS="{{ pgscv_exporter_disable_collectors }}" \
       {% endif %}
         --env=DATABASE_DSN="{{ pgscv_exporter_database_dsn }}" \
         weaponry/pgscv:latest
