@@ -1,0 +1,10 @@
+---
+dependencies: []
+galaxy_info:
+  description: deploy pgscv exporter
+  min_ansible_version: 2.10
+  platforms:
+  - name: Debian
+    versions: [all]
+  - name: Ubuntu
+    versions: [all]
