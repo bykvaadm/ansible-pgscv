@@ -1,0 +1,7 @@
+---
+- name: restart service pgscv-exporter
+  systemd:
+    name: pgscv-exporter
+    daemon_reload: yes
+    enabled: yes
+    state: restarted

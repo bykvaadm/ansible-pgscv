@@ -1,0 +1,40 @@
+---
+- name: ensure systemd service
+  notify: restart service pgscv-exporter
+  copy:
+    dest: /etc/systemd/system/pgscv-exporter.service
+    mode: 0644
+    content: |
+      [Unit]
+      Requires=docker.service
+      After=docker.service
+      StartLimitIntervalSec=0
+      [Service]
+      EnvironmentFile=/etc/environments/consul
+      ExecStartPre=-/usr/bin/docker rm --force %N
+      ExecStart=/usr/bin/docker run \
+        --name=%N \
+        --rm=true \
+        --network=host \
+        --stop-timeout=30 \
+        --env=PGSCV_LISTEN_ADDRESS=0.0.0.0:9890 \
+      {% if pgscv_exporter_disable_collectors is defined %}
+        --env=PGSCV_DISABLE_COLLECTORS="{{ pgscv_exporter_disable_collectors }}"
+      {% endif %}
+        --env=DATABASE_DSN="{{ pgscv_exporter_database_dsn }}" \
+        weaponry/pgscv:latest
+      ExecStartPost=-/opt/bin/consul-service register -e {{ env }} -n %N -p 9890 -t prometheus -j {{ project }}
+      ExecStop=-/opt/bin/consul-service deregister -e {{ env }} -n %N
+      ExecStop=-/usr/bin/docker stop %N
+      Restart=always
+      RestartSec=10
+      KillMode=process
+      [Install]
+      WantedBy=multi-user.target
+
+- name: ensure pgscv-exporter service is started
+  systemd:
+    name: pgscv-exporter
+    daemon_reload: yes
+    enabled: yes
+    state: started

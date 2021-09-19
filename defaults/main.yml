@@ -1,0 +1,3 @@
+---
+pgscv_exporter_disable_collectors: system,postgres/storage
+pgscv_exporter_database_dsn: postgresql://pgscv@127.0.0.1:5432/postgres
