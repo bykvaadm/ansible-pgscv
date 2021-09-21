@@ -10,7 +10,6 @@
       After=docker.service
       StartLimitIntervalSec=0
       [Service]
-      EnvironmentFile=/etc/environments/consul
       ExecStartPre=-/usr/bin/docker rm --force %N
       ExecStart=/usr/bin/docker run \
         --name=%N \
@@ -28,8 +27,6 @@
         --env=PGBOUNCER_DSN="{{ pgscv_exporter_pgbouncer_dsn }}" \
       {% endif %}
         weaponry/pgscv:{{ pgscv_docker_image_tag }}
-      ExecStartPost=-/opt/bin/consul-service register -e {{ env }} -n %N -p 9890 -t prometheus -j {{ project }}
-      ExecStop=-/opt/bin/consul-service deregister -e {{ env }} -n %N
       ExecStop=-/usr/bin/docker stop %N
       Restart=always
       RestartSec=10
