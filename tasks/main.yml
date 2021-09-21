@@ -17,12 +17,17 @@
         --rm=true \
         --network=host \
         --stop-timeout=30 \
-        --env=PGSCV_LISTEN_ADDRESS=0.0.0.0:9890 \
+        --env=PGSCV_LISTEN_ADDRESS={{ pgscv_listen_address }} \
       {% if pgscv_exporter_disable_collectors is defined %}
         --env=PGSCV_DISABLE_COLLECTORS="{{ pgscv_exporter_disable_collectors }}" \
       {% endif %}
+      {% if pgscv_exporter_database_dsn is defined %}
         --env=DATABASE_DSN="{{ pgscv_exporter_database_dsn }}" \
-        weaponry/pgscv:latest
+      {% endif %}
+      {% if pgscv_exporter_pgbouncer_dsn is defined %}
+        --env=PGBOUNCER_DSN="{{ pgscv_exporter_pgbouncer_dsn }}" \
+      {% endif %}
+        weaponry/pgscv:{{ pgscv_docker_image_tag }}
       ExecStartPost=-/opt/bin/consul-service register -e {{ env }} -n %N -p 9890 -t prometheus -j {{ project }}
       ExecStop=-/opt/bin/consul-service deregister -e {{ env }} -n %N
       ExecStop=-/usr/bin/docker stop %N
